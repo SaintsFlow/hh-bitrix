@@ -6,7 +6,11 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2"><i class="bi bi-people"></i> Управление сотрудниками</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
-        @if(auth('client')->user()->employees()->count() < auth('client')->user()->max_employees)
+        @if(!auth('client')->user()->isSubscriptionActive())
+        <button class="btn btn-secondary" disabled title="Подписка истекла">
+            <i class="bi bi-plus-circle"></i> Добавить сотрудника
+        </button>
+        @elseif(auth('client')->user()->employees()->count() < auth('client')->user()->max_employees)
             <a href="{{ route('client.employees.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-circle"></i> Добавить сотрудника
             </a>
@@ -15,6 +19,16 @@
             @endif
     </div>
 </div>
+
+<!-- Предупреждение об истекшей подписке -->
+@if(!auth('client')->user()->isSubscriptionActive())
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    <strong>Подписка истекла!</strong> Функции управления сотрудниками ограничены.
+    Обратитесь к администратору для продления подписки.
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+@endif
 
 @if(session('success'))
 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -87,6 +101,7 @@
                         <td>{{ $employee->created_at->format('d.m.Y') }}</td>
                         <td>
                             <div class="btn-group btn-group-sm" role="group">
+                                @if(auth('client')->user()->isSubscriptionActive())
                                 <a href="{{ route('client.employees.edit', $employee->id) }}"
                                     class="btn btn-outline-primary"
                                     title="Редактировать"
@@ -134,6 +149,17 @@
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </form>
+                                @else
+                                <button class="btn btn-outline-secondary" disabled title="Подписка истекла">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-outline-secondary" disabled title="Подписка истекла">
+                                    <i class="bi bi-shield-check"></i>
+                                </button>
+                                <button class="btn btn-outline-secondary" disabled title="Подписка истекла">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                                @endif
                             </div>
                         </td>
                     </tr>

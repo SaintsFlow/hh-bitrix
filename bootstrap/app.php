@@ -16,6 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            'subscription.active' => \App\Http\Middleware\CheckSubscriptionActive::class,
+            'token.subscription' => \App\Http\Middleware\CheckTokenSubscription::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -44,7 +44,7 @@ Route::middleware(['auth', 'role:super-admin'])->prefix('super-admin')->name('su
 });
 
 // Маршруты клиента
-Route::middleware(['auth:client'])->prefix('client')->name('client.')->group(function () {
+Route::middleware(['auth:client', 'subscription.active'])->prefix('client')->name('client.')->group(function () {
     Route::get('/dashboard', [ClientController::class, 'dashboard'])->name('dashboard');
 
     // Сотрудники
@@ -67,7 +67,7 @@ Route::middleware(['auth:client'])->prefix('client')->name('client.')->group(fun
 });
 
 // Маршруты сотрудника
-Route::middleware(['auth:employee'])->prefix('employee')->name('employee.')->group(function () {
+Route::middleware(['auth:employee', 'subscription.active'])->prefix('employee')->name('employee.')->group(function () {
     Route::get('/dashboard', [EmployeeController::class, 'dashboard'])->name('dashboard');
     Route::get('/profile/edit', [EmployeeController::class, 'editProfile'])->name('profile.edit');
     Route::put('/profile', [EmployeeController::class, 'updateProfile'])->name('profile.update');

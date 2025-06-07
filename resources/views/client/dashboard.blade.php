@@ -7,6 +7,34 @@
     <h1 class="h2"><i class="bi bi-speedometer2"></i> Панель управления</h1>
 </div>
 
+<!-- Предупреждение об истекшей подписке -->
+@if(!$client->isSubscriptionActive())
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <strong>Подписка истекла!</strong>
+            Ваша подписка истекла {{ $client->subscription_end_date->format('d.m.Y') }}.
+            Большинство функций заблокировано. Обратитесь к администратору для продления подписки.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+</div>
+@endif
+
+<!-- Сообщение из middleware -->
+@if(session('subscription_expired'))
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="bi bi-info-circle-fill"></i>
+            {{ session('subscription_expired') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+</div>
+@endif
+
 <!-- Блок уведомлений -->
 @if($notifications->count() > 0)
 <div class="row mb-4">
@@ -90,7 +118,7 @@
     </div>
 
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card text-white" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+        <div class="card text-white" style="background: linear-gradient(135deg, {{ $client->isSubscriptionActive() ? '#28a745 0%, #20c997 100%' : '#dc3545 0%, #fd7e14 100%' }});">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
@@ -104,7 +132,7 @@
                         </div>
                     </div>
                     <div class="col-auto">
-                        <i class="bi bi-calendar-check fa-2x"></i>
+                        <i class="bi bi-{{ $client->isSubscriptionActive() ? 'calendar-check' : 'calendar-x' }} fa-2x"></i>
                     </div>
                 </div>
             </div>
@@ -120,6 +148,20 @@
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
+                    @if(!$client->isSubscriptionActive())
+                    <div class="alert alert-warning mb-3">
+                        <i class="bi bi-lock-fill"></i> Функции заблокированы из-за истекшей подписки
+                    </div>
+                    <button class="btn btn-secondary" disabled title="Подписка истекла">
+                        <i class="bi bi-person-plus"></i> Добавить сотрудника
+                    </button>
+                    <button class="btn btn-secondary" disabled title="Подписка истекла">
+                        <i class="bi bi-people"></i> Управление сотрудниками
+                    </button>
+                    <button class="btn btn-secondary" disabled title="Подписка истекла">
+                        <i class="bi bi-activity"></i> Просмотреть логи
+                    </button>
+                    @else
                     @if($client->canAddEmployee())
                     <a href="{{ route('client.employees.create') }}" class="btn btn-primary">
                         <i class="bi bi-person-plus"></i> Добавить сотрудника
@@ -137,6 +179,7 @@
                     <a href="{{ route('client.activity-log') }}" class="btn btn-info">
                         <i class="bi bi-activity"></i> Просмотреть логи
                     </a>
+                    @endif
                 </div>
             </div>
         </div>

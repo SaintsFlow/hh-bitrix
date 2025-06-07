@@ -7,6 +7,34 @@
     <h1 class="h2"><i class="bi bi-speedometer2"></i> Панель сотрудника</h1>
 </div>
 
+<!-- Предупреждение об истекшей подписке компании -->
+@if(!auth('employee')->user()->client->isSubscriptionActive())
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <strong>Подписка компании истекла!</strong>
+            Подписка вашей компании истекла {{ auth('employee')->user()->client->subscription_end_date->format('d.m.Y') }}.
+            Функции могут быть ограничены. Обратитесь к администратору компании.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+</div>
+@endif
+
+<!-- Сообщение из middleware -->
+@if(session('subscription_expired'))
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="bi bi-info-circle-fill"></i>
+            {{ session('subscription_expired') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+</div>
+@endif
+
 <div class="row mb-4">
     <div class="col-xl-3 col-md-6 mb-4">
         <div class="card text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
@@ -63,15 +91,21 @@
     </div>
 
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card text-white" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+        <div class="card text-white" style="background: linear-gradient(135deg, {{ auth('employee')->user()->client->isSubscriptionActive() ? '#28a745 0%, #20c997 100%' : '#dc3545 0%, #fd7e14 100%' }});">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-uppercase mb-1">Регистрация</div>
-                        <div class="h5 mb-0 font-weight-bold">{{ auth('employee')->user()->created_at->format('d.m.Y') }}</div>
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">Подписка компании</div>
+                        <div class="h5 mb-0 font-weight-bold">
+                            @if(auth('employee')->user()->client->isSubscriptionActive())
+                            Активна
+                            @else
+                            Истекла
+                            @endif
+                        </div>
                     </div>
                     <div class="col-auto">
-                        <i class="bi bi-calendar-check fa-2x"></i>
+                        <i class="bi bi-{{ auth('employee')->user()->client->isSubscriptionActive() ? 'calendar-check' : 'calendar-x' }} fa-2x"></i>
                     </div>
                 </div>
             </div>
@@ -129,9 +163,15 @@
                     </div>
                 </div>
                 <div class="d-flex justify-content-end">
+                    @if(auth('employee')->user()->client->isSubscriptionActive())
                     <a href="{{ route('employee.profile.edit') }}" class="btn btn-primary">
                         <i class="bi bi-pencil"></i> Редактировать профиль
                     </a>
+                    @else
+                    <button class="btn btn-secondary" disabled title="Подписка компании истекла">
+                        <i class="bi bi-pencil"></i> Редактировать профиль
+                    </button>
+                    @endif
                 </div>
             </div>
         </div>
@@ -181,13 +221,23 @@
                 <h6 class="card-title mb-0"><i class="bi bi-shield-check"></i> Мои токены</h6>
             </div>
             <div class="card-body">
+                @if(!auth('employee')->user()->client->isSubscriptionActive())
+                <div class="alert alert-warning mb-3">
+                    <i class="bi bi-exclamation-triangle"></i> Токены могут быть неактивны из-за истекшей подписки
+                </div>
+                @endif
+
                 @foreach(auth('employee')->user()->tokens as $token)
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <div>
                         <div class="fw-bold">{{ $token->name }}</div>
                         <small class="text-muted">Создан {{ $token->created_at->format('d.m.Y') }}</small>
                     </div>
+                    @if(auth('employee')->user()->client->isSubscriptionActive())
                     <span class="badge bg-success">Активен</span>
+                    @else
+                    <span class="badge bg-danger">Заблокирован</span>
+                    @endif
                 </div>
                 @if(!$loop->last)
                 <hr>
