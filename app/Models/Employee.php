@@ -42,7 +42,9 @@ class Employee extends Authenticatable
     {
         return LogOptions::defaults()
             ->logAll()
-            ->logOnlyDirty();
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->logExcept(['password', 'remember_token', 'updated_at']);
     }
 
     public function client()

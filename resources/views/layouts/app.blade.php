@@ -140,6 +140,17 @@
                                 <i class="bi bi-activity"></i> Лог активности
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('client.notifications*') ? 'active' : '' }}"
+                                href="{{ route('client.notifications') }}">
+                                <i class="bi bi-bell"></i> Уведомления
+                                @if(auth()->guard('client')->check() && auth()->guard('client')->user()->notifications()->unread()->count() > 0)
+                                <span class="badge bg-warning text-dark ms-1">
+                                    {{ auth()->guard('client')->user()->notifications()->unread()->count() }}
+                                </span>
+                                @endif
+                            </a>
+                        </li>
                         @elseif(auth()->guard('employee')->check())
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('employee.dashboard') ? 'active' : '' }}"

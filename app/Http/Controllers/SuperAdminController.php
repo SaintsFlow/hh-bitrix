@@ -103,17 +103,57 @@ class SuperAdminController extends Controller
             'subscription_end_date' => 'required|date|after:today',
         ]);
 
+        $oldEndDate = $client->subscription_end_date;
+
         $client->update([
             'subscription_end_date' => $request->subscription_end_date
         ]);
 
+        // Если подписка была истекшей и теперь продлена - восстанавливаем токены
+        if ($oldEndDate < now() && $client->isSubscriptionActive()) {
+            $this->restoreEmployeeTokens($client);
+        }
+
+        // Отмечаем связанные уведомления как прочитанные
+        $client->notifications()->whereIn('type', ['expired', 'warning'])->update(['is_read' => true]);
+
         activity()
             ->performedOn($client)
             ->causedBy(auth()->user())
-            ->withProperties(['old_end_date' => $client->getOriginal('subscription_end_date')])
+            ->withProperties(['old_end_date' => $oldEndDate])
             ->log('Подписка продлена до ' . $request->subscription_end_date);
 
         return back()->with('success', 'Подписка успешно продлена');
+    }
+
+    /**
+     * Восстанавливает токены для всех активных сотрудников клиента
+     */
+    private function restoreEmployeeTokens(Client $client)
+    {
+        $restoredCount = 0;
+
+        foreach ($client->employees()->where('is_active', true)->get() as $employee) {
+            // Проверяем, есть ли у сотрудника токены
+            if ($employee->tokens()->count() === 0) {
+                // Создаем новый токен
+                $token = $employee->createToken('API Token')->plainTextToken;
+                $restoredCount++;
+
+                activity()
+                    ->performedOn($employee)
+                    ->causedBy(auth()->user())
+                    ->log('Токен восстановлен после продления подписки');
+            }
+        }
+
+        if ($restoredCount > 0) {
+            activity()
+                ->performedOn($client)
+                ->causedBy(auth()->user())
+                ->withProperties(['restored_tokens' => $restoredCount])
+                ->log("Восстановлено токенов: {$restoredCount}");
+        }
     }
 
     public function toggleClientStatus(Client $client)
@@ -235,5 +275,31 @@ class SuperAdminController extends Controller
         $activities = $query->orderBy('created_at', 'desc')->paginate(20);
 
         return view('super-admin.activity-log', compact('activities'));
+    }
+
+    public function destroyEmployee(Employee $employee)
+    {
+        // Сохраняем информацию для логирования
+        $employeeName = $employee->name;
+        $clientName = $employee->client->name;
+
+        // Отзываем все токены перед удалением
+        $employee->tokens()->delete();
+
+        // Логируем удаление ПЕРЕД удалением модели
+        activity()
+            ->performedOn($employee)
+            ->causedBy(auth()->user())
+            ->withProperties([
+                'employee_name' => $employeeName,
+                'client_name' => $clientName,
+                'employee_id' => $employee->id,
+                'client_id' => $employee->client_id
+            ])
+            ->log('Сотрудник удален супер-админом');
+
+        $employee->delete();
+
+        return redirect()->route('super-admin.employees')->with('success', 'Сотрудник успешно удален');
     }
 }

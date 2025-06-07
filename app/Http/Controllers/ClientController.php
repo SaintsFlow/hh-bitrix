@@ -22,7 +22,10 @@ class ClientController extends Controller
         $employeesCount = $client->employees()->count();
         $activeEmployeesCount = $client->employees()->where('is_active', true)->count();
 
-        return view('client.dashboard', compact('client', 'employeesCount', 'activeEmployeesCount'));
+        // Получаем непрочитанные уведомления
+        $notifications = $client->notifications()->unread()->latest()->take(5)->get();
+
+        return view('client.dashboard', compact('client', 'employeesCount', 'activeEmployeesCount', 'notifications'));
     }
 
     public function employees(Request $request)
@@ -142,15 +145,25 @@ class ClientController extends Controller
             abort(403);
         }
 
+        // Сохраняем информацию для логирования
+        $employeeName = $employee->name;
+        $employeeEmail = $employee->email;
+
         // Отзываем все токены перед удалением
         $employee->tokens()->delete();
 
-        $employee->delete();
-
+        // Логируем удаление ПЕРЕД удалением модели
         activity()
             ->performedOn($employee)
             ->causedBy($client)
+            ->withProperties([
+                'employee_name' => $employeeName,
+                'employee_email' => $employeeEmail,
+                'employee_id' => $employee->id
+            ])
             ->log('Сотрудник удален клиентом');
+
+        $employee->delete();
 
         return redirect()->route('client.employees.index')->with('success', 'Сотрудник успешно удален');
     }
@@ -207,5 +220,31 @@ class ClientController extends Controller
         $activities = $query->orderBy('created_at', 'desc')->paginate(20);
 
         return view('client.activity-log', compact('activities'));
+    }
+
+    public function notifications()
+    {
+        $client = Auth::guard('client')->user();
+        $notifications = $client->notifications()->latest()->paginate(10);
+
+        return view('client.notifications', compact('notifications'));
+    }
+
+    public function markNotificationAsRead($id)
+    {
+        $client = Auth::guard('client')->user();
+        $notification = $client->notifications()->findOrFail($id);
+
+        $notification->update(['is_read' => true]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function markAllNotificationsAsRead()
+    {
+        $client = Auth::guard('client')->user();
+        $client->notifications()->unread()->update(['is_read' => true]);
+
+        return back()->with('success', 'Все уведомления отмечены как прочитанные');
     }
 }

@@ -7,6 +7,39 @@
     <h1 class="h2"><i class="bi bi-speedometer2"></i> Панель управления</h1>
 </div>
 
+<!-- Блок уведомлений -->
+@if($notifications->count() > 0)
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-bell-fill"></i> Уведомления
+                    <span class="badge bg-dark">{{ $notifications->count() }}</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                @foreach($notifications as $notification)
+                <div class="alert alert-{{ $notification->type === 'expired' ? 'danger' : 'warning' }} alert-dismissible fade show" role="alert">
+                    <i class="bi bi-{{ $notification->type === 'expired' ? 'exclamation-triangle-fill' : 'info-circle-fill' }}"></i>
+                    {{ $notification->message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" onclick="markAsRead({{ $notification->id }})"></button>
+                </div>
+                @endforeach
+
+                @if($notifications->count() >= 5)
+                <div class="text-center">
+                    <a href="{{ route('client.notifications') }}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-list"></i> Показать все уведомления
+                    </a>
+                </div>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
 <div class="row mb-4">
     <div class="col-xl-3 col-md-6 mb-4">
         <div class="card text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
@@ -141,4 +174,27 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    function markAsRead(notificationId) {
+        fetch(`/client/notifications/${notificationId}/mark-read`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Уведомление отмечено как прочитанное');
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+            });
+    }
+</script>
 @endsection

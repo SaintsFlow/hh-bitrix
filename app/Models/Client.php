@@ -61,4 +61,19 @@ class Client extends Authenticatable
     {
         return $this->is_active && $this->subscription_end_date >= now()->toDateString();
     }
+
+    public function subscriptionNotifications()
+    {
+        return $this->hasMany(SubscriptionNotification::class);
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(SubscriptionNotification::class);
+    }
+
+    public function unreadNotifications()
+    {
+        return $this->subscriptionNotifications()->unread()->orderBy('sent_at', 'desc');
+    }
 }

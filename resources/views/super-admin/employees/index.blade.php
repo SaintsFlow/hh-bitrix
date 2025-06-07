@@ -81,7 +81,10 @@
                         <td>
                             <div class="btn-group btn-group-sm" role="group">
                                 <a href="{{ route('super-admin.employees.edit', $employee) }}"
-                                    class="btn btn-outline-primary" title="Редактировать">
+                                    class="btn btn-outline-primary"
+                                    title="Редактировать"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top">
                                     <i class="bi bi-pencil"></i>
                                 </a>
 
@@ -89,7 +92,9 @@
                                     @csrf
                                     <button type="submit"
                                         class="btn btn-outline-success"
-                                        title="Выпустить/Обновить токен">
+                                        title="Выпустить/Обновить токен"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top">
                                         <i class="bi bi-key"></i>
                                     </button>
                                 </form>
@@ -101,11 +106,26 @@
                                     <button type="submit"
                                         class="btn btn-outline-danger"
                                         title="Отозвать токен"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
                                         onclick="return confirm('Вы уверены?')">
                                         <i class="bi bi-shield-x"></i>
                                     </button>
                                 </form>
                                 @endif
+
+                                <form method="POST" action="{{ route('super-admin.employees.destroy', $employee) }}" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                        class="btn btn-outline-danger"
+                                        title="Удалить сотрудника"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        onclick="return confirm('Вы уверены? Это действие нельзя отменить!')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>
@@ -131,4 +151,16 @@
     </div>
     @endif
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    // Инициализация tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
 @endsection

@@ -35,6 +35,7 @@ Route::middleware(['auth', 'role:super-admin'])->prefix('super-admin')->name('su
     Route::post('/employees', [SuperAdminController::class, 'storeEmployee'])->name('employees.store');
     Route::get('/employees/{employee}/edit', [SuperAdminController::class, 'editEmployee'])->name('employees.edit');
     Route::put('/employees/{employee}', [SuperAdminController::class, 'updateEmployee'])->name('employees.update');
+    Route::delete('/employees/{employee}', [SuperAdminController::class, 'destroyEmployee'])->name('employees.destroy');
     Route::post('/employees/{employee}/token', [SuperAdminController::class, 'generateToken'])->name('employees.token');
     Route::delete('/employees/{employee}/token', [SuperAdminController::class, 'revokeToken'])->name('employees.revoke-token');
 
@@ -58,6 +59,11 @@ Route::middleware(['auth:client'])->prefix('client')->name('client.')->group(fun
 
     // Логи активности
     Route::get('/activity-log', [ClientController::class, 'activityLog'])->name('activity-log');
+
+    // Уведомления
+    Route::get('/notifications', [ClientController::class, 'notifications'])->name('notifications');
+    Route::post('/notifications/{notification}/mark-read', [ClientController::class, 'markNotificationAsRead'])->name('notifications.mark-read');
+    Route::post('/notifications/mark-all-read', [ClientController::class, 'markAllNotificationsAsRead'])->name('notifications.mark-all-read');
 });
 
 // Маршруты сотрудника

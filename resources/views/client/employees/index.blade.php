@@ -88,7 +88,10 @@
                         <td>
                             <div class="btn-group btn-group-sm" role="group">
                                 <a href="{{ route('client.employees.edit', $employee->id) }}"
-                                    class="btn btn-outline-primary" title="Редактировать">
+                                    class="btn btn-outline-primary"
+                                    title="Редактировать"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top">
                                     <i class="bi bi-pencil"></i>
                                 </a>
                                 @if($employee->tokens()->count() > 0)
@@ -97,7 +100,11 @@
                                     onsubmit="return confirm('Отозвать токены сотрудника?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-outline-warning" title="Отозвать токены">
+                                    <button type="submit"
+                                        class="btn btn-outline-warning"
+                                        title="Отозвать токены"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top">
                                         <i class="bi bi-shield-x"></i>
                                     </button>
                                 </form>
@@ -105,7 +112,11 @@
                                 <form method="POST" action="{{ route('client.employees.issue-token', $employee->id) }}"
                                     style="display: inline;">
                                     @csrf
-                                    <button type="submit" class="btn btn-outline-success" title="Выдать токен">
+                                    <button type="submit"
+                                        class="btn btn-outline-success"
+                                        title="Выдать токен"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top">
                                         <i class="bi bi-shield-check"></i>
                                     </button>
                                 </form>
@@ -115,7 +126,11 @@
                                     onsubmit="return confirm('Удалить сотрудника?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-outline-danger" title="Удалить">
+                                    <button type="submit"
+                                        class="btn btn-outline-danger"
+                                        title="Удалить"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </form>
@@ -181,4 +196,16 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    // Инициализация tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
 @endsection
