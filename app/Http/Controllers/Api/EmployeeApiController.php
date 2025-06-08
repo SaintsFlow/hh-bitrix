@@ -25,6 +25,16 @@ class EmployeeApiController extends Controller
         $employee = $request->user();
         $client = $employee->client;
 
+        // Логируем запрос данных через API
+        activity()
+            ->performedOn($employee)
+            ->causedBy($employee)
+            ->withProperties([
+                'token_name' => $request->user()->currentAccessToken()->name,
+                'via_api' => true
+            ])
+            ->log('Запрошены данные сотрудника через API');
+
         return response()->json([
             'success' => true,
             'data' => [
@@ -123,6 +133,22 @@ class EmployeeApiController extends Controller
             $successCount = collect($results)->where('success', true)->count();
             $totalCount = count($results);
 
+            // Логируем отправку резюме
+            activity()
+                ->performedOn($employee)
+                ->causedBy($employee)
+                ->withProperties([
+                    'candidate_name' => $request->candidate_name,
+                    'candidate_email' => $request->candidate_email,
+                    'position' => $request->position,
+                    'source' => $request->source ?? 'API',
+                    'sent_to_systems' => $successCount,
+                    'total_systems' => $totalCount,
+                    'token_name' => $request->user()->currentAccessToken()->name,
+                    'via_api' => true
+                ])
+                ->log('Отправлено резюме через API');
+
             return response()->json([
                 'success' => $successCount > 0,
                 'message' => $successCount === $totalCount
@@ -171,6 +197,18 @@ class EmployeeApiController extends Controller
                 'status' => $integration->is_active ? 'active' : 'inactive',
             ];
         });
+
+        // Логируем запрос статуса интеграций через API
+        activity()
+            ->performedOn($employee)
+            ->causedBy($employee)
+            ->withProperties([
+                'integrations_count' => $integrations->count(),
+                'active_integrations' => $integrations->where('is_active', true)->count(),
+                'token_name' => $request->user()->currentAccessToken()->name,
+                'via_api' => true
+            ])
+            ->log('Запрошен статус интеграций через API');
 
         return response()->json([
             'success' => true,
