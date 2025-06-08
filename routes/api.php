@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\EmployeeApiController;
 
 // Базовый маршрут для получения пользователя с проверкой подписки
 Route::get('/user', function (Request $request) {
@@ -68,5 +69,17 @@ Route::middleware(['auth:sanctum', 'token.subscription'])->group(function () {
             }),
             'total_tokens' => $employee->tokens()->count(),
         ]);
+    });
+
+    // Новые маршруты для EmployeeApiController
+    Route::prefix('employee')->group(function () {
+        // Получение данных сотрудника и клиента
+        Route::get('/data', [EmployeeApiController::class, 'getEmployeeData']);
+
+        // Отправка резюме
+        Route::post('/submit-resume', [EmployeeApiController::class, 'submitResume']);
+
+        // Статус интеграций
+        Route::get('/integration-status', [EmployeeApiController::class, 'getIntegrationStatus']);
     });
 });
