@@ -104,7 +104,55 @@ class ClientIntegrationController extends Controller
             abort(403, 'Доступ запрещен');
         }
 
-        return view('client.integrations.show', compact('integration'));
+        // Подсчитываем статистику использования API из логов активности
+        $apiStats = $this->calculateApiStats($integration);
+
+        return view('client.integrations.show', compact('integration', 'apiStats'));
+    }
+
+    /**
+     * Подсчитать статистику использования API для интеграции
+     */
+    private function calculateApiStats(IntegrationSetting $integration)
+    {
+        $clientId = $integration->client_id;
+
+        // Получаем все логи активности для API endpoints этого клиента
+        $query = \Spatie\Activitylog\Models\Activity::where('properties->via_api', true)
+            ->whereHas('subject', function ($q) use ($clientId) {
+                $q->where('client_id', $clientId);
+            });
+
+        // Всего API запросов
+        $totalApiRequests = $query->count();
+
+        // API запросы за сегодня
+        $todayApiRequests = (clone $query)->whereDate('created_at', today())->count();
+
+        // Статистика по типам активности
+        $apiByType = (clone $query)->get()
+            ->groupBy('description')
+            ->map(function ($activities) {
+                return $activities->count();
+            });
+
+        // Статистика отправки резюме (самая важная для интеграций)
+        $resumeSubmissions = (clone $query)
+            ->where('description', 'Отправлено резюме через API')
+            ->count();
+
+        $resumeSubmissionsToday = (clone $query)
+            ->where('description', 'Отправлено резюме через API')
+            ->whereDate('created_at', today())
+            ->count();
+
+        return [
+            'total_api_requests' => $totalApiRequests,
+            'today_api_requests' => $todayApiRequests,
+            'resume_submissions_total' => $resumeSubmissions,
+            'resume_submissions_today' => $resumeSubmissionsToday,
+            'api_by_type' => $apiByType,
+        ];
     }
 
     /**

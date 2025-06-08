@@ -280,19 +280,46 @@
                                 <div class="row">
                                     <div class="col-6">
                                         <div class="border-end">
-                                            <h4 class="text-primary mb-0">0</h4>
-                                            <small class="text-muted">Сегодня</small>
+                                            <h4 class="text-primary mb-0">{{ $apiStats['resume_submissions_today'] }}</h4>
+                                            <small class="text-muted">Резюме сегодня</small>
                                         </div>
                                     </div>
                                     <div class="col-6">
-                                        <h4 class="text-success mb-0">0</h4>
-                                        <small class="text-muted">Всего</small>
+                                        <h4 class="text-success mb-0">{{ $apiStats['resume_submissions_total'] }}</h4>
+                                        <small class="text-muted">Резюме всего</small>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="border-end">
+                                            <h6 class="text-info mb-0">{{ $apiStats['today_api_requests'] }}</h6>
+                                            <small class="text-muted">API запросов сегодня</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <h6 class="text-secondary mb-0">{{ $apiStats['total_api_requests'] }}</h6>
+                                        <small class="text-muted">API запросов всего</small>
                                     </div>
                                 </div>
                                 <hr>
                                 <p class="text-muted small mb-0">
-                                    Количество обработанных резюме через эту интеграцию
+                                    Статистика использования API интеграции
                                 </p>
+
+                                @if(count($apiStats['api_by_type']) > 0)
+                                <div class="mt-3">
+                                    <h6 class="text-start">Активность по типам:</h6>
+                                    <div class="text-start">
+                                        @foreach($apiStats['api_by_type'] as $type => $count)
+                                        <div class="d-flex justify-content-between">
+                                            <span class="text-muted small">{{ $type }}</span>
+                                            <span class="badge bg-light text-dark">{{ $count }}</span>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                @endif
                             </div>
                         </div>
                     </div>
