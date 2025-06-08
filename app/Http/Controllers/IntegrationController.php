@@ -37,6 +37,7 @@ class IntegrationController extends Controller
         $clients = Client::all();
 
         $integrationTypes = [
+            'bitrix' => 'Bitrix24',
             'crm' => 'CRM System',
             'telegram' => 'Telegram Bot',
             'webhook' => 'Custom Webhook',
@@ -53,7 +54,7 @@ class IntegrationController extends Controller
     {
         $request->validate([
             'client_id' => 'required|exists:clients,id',
-            'type' => 'required|in:crm,telegram,webhook,email',
+            'type' => 'required|in:bitrix,crm,telegram,webhook,email',
             'name' => 'required|string|max:255',
             'is_active' => 'boolean',
             'settings' => 'required|array',
@@ -160,6 +161,7 @@ class IntegrationController extends Controller
         $clients = Client::all();
 
         $integrationTypes = [
+            'bitrix' => 'Bitrix24',
             'crm' => 'CRM System',
             'telegram' => 'Telegram Bot',
             'webhook' => 'Custom Webhook',

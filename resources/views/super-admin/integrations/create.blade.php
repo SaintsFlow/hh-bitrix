@@ -105,6 +105,32 @@
 </div>
 
 <!-- Templates for different integration types -->
+<template id="bitrix-settings-template">
+    <div class="mb-3">
+        <h6>Настройки CRM</h6>
+        <div class="row">
+            <div class="col-12 mb-3">
+                <label for="settings_api_url" class="form-label">API URL *</label>
+                <input type="url" class="form-control" name="settings[api_url]"
+                    placeholder="https://api.crm-system.com/v1" required>
+                <div class="form-text">Базовый URL для API вашей CRM системы</div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="settings_funnel_id" class="form-label">ID воронки</label>
+                <input type="text" class="form-control" name="settings[funnel_id]"
+                    placeholder="123">
+                <div class="form-text">ID воронки</div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="settings_stage_id" class="form-label">ID этапа</label>
+                <input type="text" class="form-control" name="settings[stage_id]"
+                    placeholder="456">
+                <div class="form-text">ID стадии</div>
+            </div>
+        </div>
+    </div>
+</template>
+
 <template id="crm-settings-template">
     <div class="mb-3">
         <h6>Настройки CRM</h6>

@@ -51,6 +51,7 @@
                                             <select class="form-select @error('type') is-invalid @enderror"
                                                 id="type" name="type" required onchange="updateSettingsFields()">
                                                 <option value="">Выберите тип</option>
+                                                <option value="bitrix" {{ old('type', $integration->type) == 'bitrix' ? 'selected' : '' }}>Bitrix24</option>
                                                 <option value="crm" {{ old('type', $integration->type) == 'crm' ? 'selected' : '' }}>CRM</option>
                                                 <option value="telegram" {{ old('type', $integration->type) == 'telegram' ? 'selected' : '' }}>Telegram</option>
                                                 <option value="webhook" {{ old('type', $integration->type) == 'webhook' ? 'selected' : '' }}>Webhook</option>

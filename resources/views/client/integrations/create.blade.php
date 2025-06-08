@@ -56,7 +56,8 @@
                                             <select class="form-select @error('type') is-invalid @enderror"
                                                 id="type" name="type" required onchange="updateSettingsFields()">
                                                 <option value="">Выберите тип</option>
-                                                <option value="crm" {{ old('type') == 'crm' ? 'selected' : '' }}>CRM (Bitrix24, AmoCRM и др.)</option>
+                                                <option value="bitrix" {{ old('type') == 'bitrix' ? 'selected' : '' }}>Bitrix24</option>
+                                                <option value="crm" {{ old('type') == 'crm' ? 'selected' : '' }}>CRM стороннее</option>
                                                 <option value="telegram" {{ old('type') == 'telegram' ? 'selected' : '' }}>Telegram уведомления</option>
                                                 <option value="webhook" {{ old('type') == 'webhook' ? 'selected' : '' }}>Webhook</option>
                                                 <option value="email" {{ old('type') == 'email' ? 'selected' : '' }}>Email уведомления</option>

@@ -7,6 +7,7 @@ use App\Models\IntegrationSetting;
 use App\Contracts\IntegrationServiceInterface;
 use App\Services\Integrations\CrmIntegrationService;
 use App\Services\Integrations\TelegramIntegrationService;
+use App\Services\Integrations\BitrixCrmIntegrationService;
 use App\Services\Integrations\WebhookIntegrationService;
 use App\Services\Integrations\EmailIntegrationService;
 use Illuminate\Support\Facades\Log;
@@ -15,6 +16,7 @@ class IntegrationManagerService
 {
     private array $serviceMap = [
         'crm' => CrmIntegrationService::class,
+        'bitrix' => BitrixCrmIntegrationService::class,
         'telegram' => TelegramIntegrationService::class,
         'webhook' => WebhookIntegrationService::class,
         'email' => EmailIntegrationService::class,
@@ -264,6 +266,11 @@ class IntegrationManagerService
                 'name' => 'CRM система',
                 'description' => 'Интеграция с внешней CRM системой',
                 'fields' => ['api_url', 'api_key', 'funnel_id', 'stage_id']
+            ],
+            'bitrix' => [
+                'name' => 'CRM Bitrix',
+                'description' => 'Интеграция с Bitrix24',
+                'fields' => ['api_url', 'funnel_id', 'stage_id']
             ],
             'telegram' => [
                 'name' => 'Telegram уведомления',

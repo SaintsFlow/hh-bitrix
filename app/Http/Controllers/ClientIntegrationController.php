@@ -34,6 +34,7 @@ class ClientIntegrationController extends Controller
     public function create()
     {
         $integrationTypes = [
+            'bitrix' => 'Bitrix24',
             'crm' => 'CRM System',
             'telegram' => 'Telegram Bot',
             'webhook' => 'Custom Webhook',
@@ -167,6 +168,7 @@ class ClientIntegrationController extends Controller
         }
 
         $integrationTypes = [
+            'bitrix' => 'Bitrix24',
             'crm' => 'CRM System',
             'telegram' => 'Telegram Bot',
             'webhook' => 'Custom Webhook',
