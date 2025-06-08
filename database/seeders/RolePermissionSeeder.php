@@ -24,14 +24,16 @@ class RolePermissionSeeder extends Seeder
 
         foreach ($permissions as $permission) {
             Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
+            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'client']);
+            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'employee']);
         }
 
-        // Создаем роли
+        // Создаем роли для разных guards
         $superAdminRole = Role::firstOrCreate(['name' => 'super-admin', 'guard_name' => 'web']);
-        $clientRole = Role::firstOrCreate(['name' => 'client', 'guard_name' => 'web']);
-        $employeeRole = Role::firstOrCreate(['name' => 'employee', 'guard_name' => 'web']);
+        $clientRole = Role::firstOrCreate(['name' => 'client', 'guard_name' => 'client']);
+        $employeeRole = Role::firstOrCreate(['name' => 'employee', 'guard_name' => 'employee']);
 
-        // Назначаем разрешения ролям
+        // Назначаем разрешения ролям для каждого guard
         $superAdminRole->givePermissionTo([
             'manage clients',
             'manage employees',
@@ -40,15 +42,19 @@ class RolePermissionSeeder extends Seeder
             'deactivate tokens'
         ]);
 
-        $clientRole->givePermissionTo([
-            'manage employees',
-            'manage tokens',
-            'view own profile'
-        ]);
+        $clientRole->givePermissionTo(
+            Permission::where('guard_name', 'client')->whereIn('name', [
+                'manage employees',
+                'manage tokens',
+                'view own profile'
+            ])->get()
+        );
 
-        $employeeRole->givePermissionTo([
-            'view own profile'
-        ]);
+        $employeeRole->givePermissionTo(
+            Permission::where('guard_name', 'employee')->whereIn('name', [
+                'view own profile'
+            ])->get()
+        );
 
         // Создаем супер-админа
         $superAdmin = User::firstOrCreate([
