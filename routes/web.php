@@ -5,6 +5,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\IntegrationController;
+use App\Http\Controllers\ClientIntegrationController;
 
 // Главная страница - редирект на авторизацию
 Route::get('/', function () {
@@ -41,6 +43,19 @@ Route::middleware(['auth', 'role:super-admin'])->prefix('super-admin')->name('su
 
     // Логи активности
     Route::get('/activity-log', [SuperAdminController::class, 'activityLog'])->name('activity-log');
+
+    // Интеграции
+    Route::prefix('integrations')->name('integrations.')->group(function () {
+        Route::get('/', [IntegrationController::class, 'index'])->name('index');
+        Route::get('/create', [IntegrationController::class, 'create'])->name('create');
+        Route::post('/', [IntegrationController::class, 'store'])->name('store');
+        Route::get('/{integration}', [IntegrationController::class, 'show'])->name('show');
+        Route::get('/{integration}/edit', [IntegrationController::class, 'edit'])->name('edit');
+        Route::put('/{integration}', [IntegrationController::class, 'update'])->name('update');
+        Route::delete('/{integration}', [IntegrationController::class, 'destroy'])->name('destroy');
+        Route::post('/{integration}/test', [IntegrationController::class, 'testConnection'])->name('test');
+        Route::post('/{integration}/toggle', [IntegrationController::class, 'toggleStatus'])->name('toggle');
+    });
 });
 
 // Маршруты клиента
@@ -64,6 +79,19 @@ Route::middleware(['auth:client', 'subscription.active'])->prefix('client')->nam
     Route::get('/notifications', [ClientController::class, 'notifications'])->name('notifications');
     Route::post('/notifications/{notification}/mark-read', [ClientController::class, 'markNotificationAsRead'])->name('notifications.mark-read');
     Route::post('/notifications/mark-all-read', [ClientController::class, 'markAllNotificationsAsRead'])->name('notifications.mark-all-read');
+
+    // Интеграции
+    Route::prefix('integrations')->name('integrations.')->group(function () {
+        Route::get('/', [ClientIntegrationController::class, 'index'])->name('index');
+        Route::get('/create', [ClientIntegrationController::class, 'create'])->name('create');
+        Route::post('/', [ClientIntegrationController::class, 'store'])->name('store');
+        Route::get('/{integration}', [ClientIntegrationController::class, 'show'])->name('show');
+        Route::get('/{integration}/edit', [ClientIntegrationController::class, 'edit'])->name('edit');
+        Route::put('/{integration}', [ClientIntegrationController::class, 'update'])->name('update');
+        Route::delete('/{integration}', [ClientIntegrationController::class, 'destroy'])->name('destroy');
+        Route::post('/{integration}/test', [ClientIntegrationController::class, 'testConnection'])->name('test');
+        Route::post('/{integration}/toggle', [ClientIntegrationController::class, 'toggleStatus'])->name('toggle');
+    });
 });
 
 // Маршруты сотрудника

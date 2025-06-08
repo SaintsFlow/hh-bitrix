@@ -76,4 +76,19 @@ class Client extends Authenticatable
     {
         return $this->subscriptionNotifications()->unread()->orderBy('sent_at', 'desc');
     }
+
+    public function integrationSettings()
+    {
+        return $this->hasMany(IntegrationSetting::class);
+    }
+
+    public function activeIntegrations()
+    {
+        return $this->integrationSettings()->active();
+    }
+
+    public function getIntegrationByType(string $type)
+    {
+        return $this->integrationSettings()->ofType($type)->active()->first();
+    }
 }

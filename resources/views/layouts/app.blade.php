@@ -116,6 +116,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('super-admin.integrations*') ? 'active' : '' }}"
+                                href="{{ route('super-admin.integrations.index') }}">
+                                <i class="bi bi-gear"></i> Интеграции
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('super-admin.activity-log') ? 'active' : '' }}"
                                 href="{{ route('super-admin.activity-log') }}">
                                 <i class="bi bi-activity"></i> Лог активности
@@ -132,6 +138,12 @@
                             <a class="nav-link {{ request()->routeIs('client.employees*') ? 'active' : '' }}"
                                 href="{{ route('client.employees.index') }}">
                                 <i class="bi bi-people"></i> Мои сотрудники
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('client.integrations*') ? 'active' : '' }}"
+                                href="{{ route('client.integrations.index') }}">
+                                <i class="bi bi-gear"></i> Интеграции
                             </a>
                         </li>
                         <li class="nav-item">
