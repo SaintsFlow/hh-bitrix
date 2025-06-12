@@ -18,7 +18,7 @@
                 </div>
             </div>
 
-            @if(!auth()->user()->client->subscription_active)
+            @if(!auth()->user()->isSubscriptionActive())
             <div class="alert alert-warning" role="alert">
                 <i class="fas fa-exclamation-triangle"></i>
                 <strong>Внимание!</strong> Ваша подписка неактивна. Интеграции не будут работать до активации подписки.
@@ -287,9 +287,9 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <button type="button" class="btn btn-outline-info" onclick="testConnection()" style="display: none" id="test-button">
+                            <!-- <button type="button" class="btn btn-outline-info" onclick="testConnection()" style="display: none" id="test-button">
                                 <i class="fas fa-plug"></i> Тестировать соединение
-                            </button>
+                            </button> -->
                             <div class="ms-auto">
                                 <a href="{{ route('client.integrations.index') }}" class="btn btn-secondary me-2">
                                     Отмена
@@ -383,13 +383,13 @@
                             </h5>
                         </div>
                         <div class="card-body">
-                            @if(auth()->user()->client->subscription_active)
+                            @if(auth()->user()->isSubscriptionActive())
                             <div class="text-success">
                                 <i class="fas fa-check-circle"></i>
                                 <strong>Подписка активна</strong>
                             </div>
                             <p class="small text-muted mb-0">
-                                До {{ auth()->user()->client->subscription_end_date ? auth()->user()->client->subscription_end_date->format('d.m.Y') : 'неизвестно' }}
+                                До {{ auth()->user()->subscription_end_date ? auth()->user()->subscription_end_date->format('d.m.Y') : 'неизвестно' }}
                             </p>
                             @else
                             <div class="text-danger">
@@ -443,78 +443,6 @@
             testButton.style.display = 'none';
             document.getElementById('help-default').style.display = 'block';
         }
-    }
-
-    function testConnection() {
-        const formData = new FormData(document.querySelector('form'));
-        const data = {};
-
-        // Convert FormData to object
-        for (let [key, value] of formData.entries()) {
-            if (key.startsWith('settings[')) {
-                const settingKey = key.match(/settings\[(.+)\]/)[1];
-                if (!data.settings) data.settings = {};
-                data.settings[settingKey] = value;
-            } else {
-                data[key] = value;
-            }
-        }
-
-        // Show loading state
-        const button = event.target;
-        const originalText = button.innerHTML;
-        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Тестирование...';
-        button.disabled = true;
-
-        fetch('{{ route("client.integrations.test") }}', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(data => {
-                button.innerHTML = originalText;
-                button.disabled = false;
-
-                const alertClass = data.success ? 'alert-success' : 'alert-danger';
-                const icon = data.success ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle';
-
-                const alert = `
-            <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
-                <i class="${icon}"></i> ${data.message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        `;
-
-                document.querySelector('.container-fluid').insertAdjacentHTML('afterbegin', alert);
-
-                // Auto dismiss after 5 seconds
-                setTimeout(() => {
-                    const alertElement = document.querySelector('.alert');
-                    if (alertElement) {
-                        const bsAlert = new bootstrap.Alert(alertElement);
-                        bsAlert.close();
-                    }
-                }, 5000);
-            })
-            .catch(error => {
-                button.innerHTML = originalText;
-                button.disabled = false;
-                console.error('Error:', error);
-
-                const alert = `
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="fas fa-exclamation-triangle"></i> Произошла ошибка при тестировании соединения
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        `;
-
-                document.querySelector('.container-fluid').insertAdjacentHTML('afterbegin', alert);
-            });
     }
 
     // Initialize form on page load

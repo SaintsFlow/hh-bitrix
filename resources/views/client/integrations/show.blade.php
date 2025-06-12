@@ -26,7 +26,7 @@
                 </div>
             </div>
 
-            @if(!auth()->user()->client->subscription_active)
+            @if(!auth()->user()->isSubscriptionActive())
             <div class="alert alert-warning" role="alert">
                 <i class="fas fa-exclamation-triangle"></i>
                 <strong>Внимание!</strong> Ваша подписка неактивна. Эта интеграция не работает.
@@ -332,13 +332,13 @@
                             </h5>
                         </div>
                         <div class="card-body">
-                            @if(auth()->user()->client->subscription_active)
+                            @if(auth()->user()->isSubscriptionActive())
                             <div class="text-success mb-2">
                                 <i class="fas fa-check-circle"></i>
                                 <strong>Подписка активна</strong>
                             </div>
                             <p class="small text-muted mb-0">
-                                До {{ auth()->user()->client->subscription_end_date ? auth()->user()->client->subscription_end_date->format('d.m.Y') : 'неизвестно' }}
+                                До {{ auth()->user()->subscription_end_date ? auth()->user()->subscription_end_date->format('d.m.Y') : 'неизвестно' }}
                             </p>
                             @else
                             <div class="text-danger mb-2">
